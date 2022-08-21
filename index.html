@@ -84,11 +84,15 @@
 
         }
         let dzi = "complete_im_1.dzi"
-        const viewer = OpenSeadragon({
+        var viewer = OpenSeadragon({
             id: "seadragon-viewer",
             prefixUrl: "//openseadragon.github.io/openseadragon/images/",
             showNavigator:  true,
+            navigatorPosition:   "BOTTOM_RIGHT",
             visibilityRatio: 1.0,
+            zoomInButton: "zoom-in",
+            zoomOutButton: "zoom-out",
+            homeButton: "home",
             constrainDuringPan: true,
             defaultZoomLevel: 0.8,
             minZoomLevel: 0.8,
@@ -98,9 +102,6 @@
             tileSources: dzi,
 
         });
-        
-        const annotations = new OpenSeadragon.Annotations({ viewer });
-        
         function infoClicked() {
             document.querySelector(".info_container").classList.toggle("hide")
             document.querySelector(".rectangle").classList.toggle("hide")
