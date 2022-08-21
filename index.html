@@ -70,7 +70,7 @@
     </div>
     <button class="btn" id="showDetails" onclick="showDetails()"> <i class="fa fa-plus-circle"></i> Show
         Details</button>
-    <div id="seadragon-viewer" style="width:100%; height:88vh;z-index: 1;"></div>
+    <div id="seadragon-viewer" style="width:100%; height:88vh;"></div>
     
     <section id="compnay-name">
         <p>Copyright &copy; <a target="_blank" rel="noopener noreferrer" href="https://www.alphadx.org" style="color:white">AlphaDx</a></p>
@@ -84,7 +84,7 @@
 
         }
         let dzi = "complete_im_1.dzi"
-        var viewer = OpenSeadragon({
+        const viewer = OpenSeadragon({
             id: "seadragon-viewer",
             prefixUrl: "//openseadragon.github.io/openseadragon/images/",
             visibilityRatio: 1.0,
@@ -100,6 +100,8 @@
             tileSources: dzi,
 
         });
+        
+        const annotations = new OpenSeadragon.Annotations({ viewer });
         
         function infoClicked() {
             document.querySelector(".info_container").classList.toggle("hide")

@@ -30,7 +30,6 @@
     0 0 12px 12px rgb(55,125,49),
     0 0 15px 15px rgb(30,75,238),
     0 0 20px 20px rgb(102,20,126);
-    z-index: 1000000;
 }
 
 .zoom_header > div img {
