@@ -60,7 +60,9 @@
         <img src="mouse-outline-hi.png" alt=""  style="height:154px;width:300px;margin-left:50px" >
         <h1>Whole-Brain, Mus Musculus</h1>
         <h2>Vizgen MERFISH Mouse Receptor Map</h2>
-        <span>This dataset contains a MERFISH measurement of a gene panel containing 483 total genes including canonical brain cell type markers, GPCRs, and RTKs measured on 3 full coronal slices across 3 biological replicates. The dataset includes the list of detected transcripts, gene counts per cell matrix, additional spatial cell metadata, cell boundary polygons, and DAPI images.<br><br><br>
+        <span>This dataset contains a MERFISH measurement of a gene panel containing 483 total genes including canonical brain cell type markers, GPCRs, and RTKs measured on 3 full coronal slices across 3 biological replicates. The dataset includes the list of detected transcripts, gene counts per cell matrix, additional spatial cell metadata, cell boundary polygons, and DAPI images.<br><br>
+            <div id="NAVPOS"></div>
+            <br>
             <br>
             <br>
              <br>
@@ -88,7 +90,8 @@
             id: "seadragon-viewer",
             prefixUrl: "//openseadragon.github.io/openseadragon/images/",
             showNavigator:  true,
-            navigatorPosition:   "BOTTOM_RIGHT",
+            //navigatorPosition:   "BOTTOM_RIGHT",
+            navigatorId:   "NAVPOS",
             visibilityRatio: 1.0,
             zoomInButton: "zoom-in",
             zoomOutButton: "zoom-out",
