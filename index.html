@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
         integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3-selection-multi.v0.4.min.js"></script>
+
     <link rel="stylesheet" href="style.css">
     <title>Document</title>
 
@@ -56,6 +59,9 @@
     
     
     </div>
+    <select class="genes_toggle">
+        <option value="" selected>select a gene</option>
+    </select>
     <div class="details hideDetails">
         <img src="mouse-outline-hi.png" alt=""  style="height:154px;width:300px;margin-left:50px" >
         <h1>Whole-Brain, Mus Musculus</h1>
@@ -78,14 +84,10 @@
         <p>Copyright &copy; <a target="_blank" rel="noopener noreferrer" href="https://www.alphadx.org" style="color:white">AlphaDx</a></p>
     </section>
     <script src="//openseadragon.github.io/openseadragon/openseadragon.min.js"></script>
-    <script src="openseadragon-draggable-navigator.js"></script>
-    <script src="openseadragon-canvas-overlay-hd.js"></script>
+    <!-- <script src="openseadragon-draggable-navigator.js"></script>
+    <script src="openseadragon-canvas-overlay-hd.js"></script> -->
+    <script src="openseadragon-svg-overlay.js"></script>
     <script>
-        let duomo = {
-            type: 'image',
-            url: 'https://graphy101.s3.us-west-1.amazonaws.com/complete_im_1.jpeg',
-
-        }
         let dzi = "complete_im_1.dzi"
         var viewer = OpenSeadragon({
             id: "seadragon-viewer",
@@ -102,21 +104,102 @@
             minZoomLevel: 0.8,
             // maxZoomLevel: 2,
             visibilityRatio: 1,
-
             tileSources: dzi,
+        });
 
-        });
-        var overlayCoordinates = {x: 100000, y: 100000, radius: 300};
-        var colors = ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6'];
-        var overlay = new OpenSeadragon.CanvasOverlayHd(viewer, {
-            onRedraw: function (opts) {
-                var context = opts.context;
-                context.fillStyle = colors[opts.index % colors.length];
-                context.beginPath();
-                context.arc(overlayCoordinates.x, overlayCoordinates.y, overlayCoordinates.radius, 0, Math.PI * 2, true);
-                context.fill();
-            }
-        });
+        let svg_overlay = viewer.svgOverlay();
+            let overlay = d3.select(svg_overlay.node());
+
+        fetch("Order_Of_Labels.csv").then(res => res.text()).then(data => {
+            const temp = data.split("\n");
+            temp.forEach((name, i) => {
+                var option = document.createElement('option');
+                option.value = name;
+                option.innerText = name;
+                document.querySelector(".genes_toggle").appendChild(option);
+            });
+        })
+
+        //z0_global_corrdinates.csv
+        d3.csv("z0_global_corrdinates.csv", function (data) {
+
+
+
+            const containers = d3.select("svg").append("g").attr("class", "tooltip");
+            containers.append("rect");
+            containers.append("text").text('My Text Here')
+
+            document.querySelector(".genes_toggle").addEventListener("change", function () {
+                let value = document.querySelector(".genes_toggle").value.trim();
+                let result = data;
+                if (value != "All Genes") {
+                    result = data.filter((item) => {
+                        return value === item.gene;
+                    });
+                }
+
+                chunk = 0;
+                overlay.selectAll('*').remove();
+
+                var startTime = performance.now()
+
+
+
+                let circle = overlay.selectAll('circle');
+                const interval = setInterval(() => {
+                    let add = 500;
+                    if (value == "All Genes") {
+                        add = 200;
+                    }
+
+                    if (result.length - chunk < 0) {
+                        add = Math.abs(result.length - chunk);
+                    }
+
+                    circle.data(result.slice(chunk, chunk + add)).enter().append('circle').attrs({
+                        gene: function (d) {
+                            return d.gene;
+                        },
+                        cx: function (d) {
+                            return parseFloat(d.x) * 0.0000115 + 0.140;
+                        },
+                        cy: function (d) {
+                            return parseFloat(d.y) * 0.0000115 + 0.09;
+                        },
+                        r: function (d) {
+                            return 0.001;
+                        }
+                    })
+
+
+                    if (result.length - chunk <= 0) {
+                        console.log("finished");
+                        var endTime = performance.now()
+
+                        console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
+                        d3.selectAll('circle').enter().each(function () {
+                            return svg_overlay.onClick(this, function () {
+                                const cx = this.element.getAttribute("cx")
+                                const cy = this.element.getAttribute("cy")
+                                const gene = this.element.getAttribute("gene")
+                                console.log(this);
+                                return d3.select('.tooltip').attr("x", cx).attr("y", cy);
+                            });
+                        });
+                        d3.select(window).on('resize', function () {
+                            return svg_overlay.resize();
+                        });
+                        clearInterval(interval);
+                    }
+                    chunk += 500;
+
+                }, 10);
+
+
+
+            });//change event
+        });//csv fetch d3
+
         
         function infoClicked() {
             document.querySelector(".info_container").classList.toggle("hide")
@@ -142,14 +225,14 @@
         
         
         
-        viewer.gestureSettingsMouse.clickToZoom = false;
-        viewer.gestureSettingsMouse.dblClickToZoom = false;
-        viewer.gestureSettingsMouse.pinchToZoom = false;
-        viewer.gestureSettingsMouse.pinchRotate = false;
-        viewer.setNavigatorDraggable(true);
+        // viewer.gestureSettingsMouse.clickToZoom = false;
+        // viewer.gestureSettingsMouse.dblClickToZoom = false;
+        // viewer.gestureSettingsMouse.pinchToZoom = false;
+        // viewer.gestureSettingsMouse.pinchRotate = false;
+        // viewer.setNavigatorDraggable(true);
         
-        document.querySelector(".openseadragon-container").style.backgroundColor = "rgba(255, 255, 255, 0)"
-        document.querySelector(".openseadragon-canvas").style.backgroundColor = "rgba(255, 255, 255, 0)"
+        // document.querySelector(".openseadragon-container").style.backgroundColor = "rgba(255, 255, 255, 0)"
+        // document.querySelector(".openseadragon-canvas").style.backgroundColor = "rgba(255, 255, 255, 0)"
         
                 
         

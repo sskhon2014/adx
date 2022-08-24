@@ -303,3 +303,47 @@ p#team-member-des {
 .openseadragon-canvas:focus {
   outline: none;
 }
+
+
+
+.color--white {
+    color: white;
+}
+
+.bg--white {
+    background-color: white;
+}
+
+#seadragon-viewer circle{
+    fill:rgba(0, 0, 255, 0.8);
+}
+
+
+.dot{
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: red;
+}
+
+
+
+.genes_toggle {
+    position: fixed;
+    bottom: 70px;
+    left: 50px;
+    margin: 10px;
+    z-index: 5000;
+    background-color: black;
+    padding: 10px 20px;
+    color: white;
+    border: solid 2px white;
+    border-radius: 5px;
+    outline: solid 2px black;
+}
+
+
+.svg_overlay{
+    position: absolute;
+    background-color: red;
+}
